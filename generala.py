@@ -87,8 +87,10 @@ class Turno:
         self.dados_seguir = Dados(0)
 
     def guardar_dados(self, indices):
+        dados_finales_ant = self.dados_finales
+        self.dados_seguir = Dados(0)
         for indice in indices:
-            self.dados_seguir.valores.append(self.dados_lanzados.valores[indice])
+            self.dados_seguir.valores.append(dados_finales_ant[indice])
         self.siguiente_turno()
 
     def siguiente_turno(self):
@@ -98,12 +100,9 @@ class Turno:
         self.numero_lanzamiento += 1
         self.dados_lanzados = Dados(5 - self.dados_seguir.cantidad)
 
-    def generala_servida(self, dados_finales):
-        repetidos = calcular_repetidos(dados_finales)
-        if buscar_repetido(dados_finales, repetidos, 5) and self.numero_lanzamiento == 1:
-            return True
-        else:
-            return False
+    def generala_servida(self):
+        repetidos = calcular_repetidos(self.dados_finales)
+        return buscar_repetido(self.dados_finales, repetidos, 5) and self.numero_lanzamiento == 1
 
     @property
     def dados_finales(self):
@@ -189,8 +188,8 @@ class Generala:
             if self.turno_actual.numero_lanzamiento == 3:
                 self.jugador_esta_jugando = False
 
-    def victoria_instantanea(self, condicion):
-        if condicion:
+    def victoria_instantanea(self):
+        if self.turno_actual.generala_servida():
             self.jugador_esta_jugando = False
             self.esta_jugado = False
             return True
@@ -198,20 +197,23 @@ class Generala:
             return False
 
 def main():
-    cantidad_jugadores = int(input('cantidad jugadores'))
+    cantidad_jugadores = int(input('Cantidad jugadores: '))
     juego = Generala(cantidad_jugadores)
     while juego.esta_jugado:
-        if juego.victoria_instantanea(juego.turno_actual.generala_servida(juego.turno_actual.dados_finales)):
-                print("Ganaste")
+        if juego.victoria_instantanea():
+                print("Tenes generala servida. ¡¡Ganaste!!")
+                break
         else:
             while juego.jugador_esta_jugando:
-                print('jugador actual: {}'.format(juego.jugador_actual))
+                print('Jugador actual: {}'.format(juego.jugador_actual))
+                print('\nLanzamiento nº: {}'.format(juego.turno_actual.numero_lanzamiento))
                 print(juego.turno_actual.dados_finales)
-                dados_seguir = input('Elija los dados con los que quiere seguir o presione enter para finalizar el turno.')
+                dados_seguir = input('Elija los dados con los que quiere seguir o presione enter para tirar todos los dados nuevamente. \n Para finalizar el turno escriba ANOTAR:\n')
                 juego.dados_finales(dados_seguir)
-            print('jugador actual: {}'.format(juego.jugador_actual))
+            print('Jugador actual: {}'.format(juego.jugador_actual))
+            print('\nLanzamiento nº: {}'.format(juego.turno_actual.numero_lanzamiento))
             print(juego.turno_actual.dados_finales)
-            jugada = input('¿Que jugada quiere anotar?')
+            jugada = input('¿Que jugada quiere anotar?\n')
             print(juego.anotar(jugada))
             print(juego.tabla_puntos._tabla)
 

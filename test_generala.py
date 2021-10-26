@@ -48,44 +48,65 @@ class TurnoTest(unittest.TestCase):
         self.assertEqual(turno.dados_lanzados.cantidad, 5)
         self.assertEqual(len(turno.dados_finales), 5)
 
+    def test_can_dados_2_lanzamiento_guardar_dados_2_veces(self):
+        turno = Turno()
+        turno.guardar_dados([0,2,4])  # Los que NO vamos a tirar de nuevos (Guardamos tres)
+        self.assertEqual(turno.dados_seguir.cantidad, 3)
+        self.assertEqual(turno.dados_lanzados.cantidad, 2)
+        self.assertEqual(len(turno.dados_finales), 5)
+        turno.guardar_dados([3,4])  # Los que NO vamos a tirar de nuevos (Guardamos tres)
+        self.assertEqual(turno.dados_seguir.cantidad, 2)
+        self.assertEqual(turno.dados_lanzados.cantidad, 3)
+        self.assertEqual(len(turno.dados_finales), 5)
+    
     def test_can_dados_turno2_1dado(self):
         turno = Turno()
         turno.guardar_dados([3])  # Los que NO vamos a tirar de nuevos (Guardamos uno)
         self.assertEqual(turno.dados_seguir.cantidad, 1)
         self.assertEqual(turno.dados_lanzados.cantidad, 4)
+        self.assertEqual(len(turno.dados_finales), 5)
 
     def test_can_dados_turno2_2dado(self):
         turno = Turno()
         turno.guardar_dados([3, 1])  # Los que NO vamos a tirar de nuevos (Guardamos uno)
         self.assertEqual(turno.dados_seguir.cantidad, 2)
         self.assertEqual(turno.dados_lanzados.cantidad, 3)
+        self.assertEqual(len(turno.dados_finales), 5)
 
     def test_can_dados_turno2_4dado(self):
         turno = Turno()
         turno.guardar_dados([0, 1, 2, 3])  # Los que NO vamos a tirar de nuevos (Guardamos uno)
         self.assertEqual(turno.dados_seguir.cantidad, 4)
         self.assertEqual(turno.dados_lanzados.cantidad, 1)
+        self.assertEqual(len(turno.dados_finales), 5)
 
     def test_generala_servida_1(self):
         turno = Turno()
-        dados_lanzados = [1,1,1,1,1]
-        self.assertTrue(turno.generala_servida(dados_lanzados))
+        dados = turno.dados_lanzados
+        dados._valores = [1,1,1,1,1]
+        turno.dados_lanzados = dados
+        self.assertTrue(turno.generala_servida())
     
     def test_generala_servida_not(self):
         turno = Turno()
-        dados_lanzados = [1,1,1,1,5]
-        self.assertFalse(turno.generala_servida(dados_lanzados))
+        dados = turno.dados_lanzados
+        dados._valores = [1,1,1,1,4]
+        turno.dados_lanzados = dados
+        self.assertFalse(turno.generala_servida())
 
     def test_generala_servida_4(self):
         turno = Turno()
-        dados_lanzados = [4,4,4,4,4]
-        self.assertTrue(turno.generala_servida(dados_lanzados))
+        dados = turno.dados_lanzados
+        dados._valores = [4,4,4,4,4]
+        turno.dados_lanzados = dados
+        self.assertTrue(turno.generala_servida())
 
     def test_generala_NOservida(self):
         turno = Turno()
-        dados_lanzados = [1,1,1,1,1]
+        dados = turno.dados_lanzados
+        dados._valores = [1,1,1,1,1]
         turno.numero_lanzamiento = 2
-        self.assertFalse(turno.generala_servida(dados_lanzados))
+        self.assertFalse(turno.generala_servida())
 
 class TablaPuntosTest(unittest.TestCase):
     def test_anotar_doble(self):
